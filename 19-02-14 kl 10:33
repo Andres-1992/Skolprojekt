@@ -1,6 +1,10 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace Skolprojekt_spelregister
+namespace SpelRegister
 {
     class Program
     {
@@ -16,7 +20,7 @@ namespace Skolprojekt_spelregister
             while (true)
             {
                 SkrivUtMeny();
-                int menyVal = ReadInt();
+                int menyVal = TestaInt();
                 if (menyVal == 1)
                 {
                     spelInfo = RegistreraSpel(spelInfo);
@@ -58,61 +62,61 @@ namespace Skolprojekt_spelregister
             Console.WriteLine("[5] Avsluta");
             Console.WriteLine("----------------------");
             Console.Write("Ange menyval: ");
-           
+
         }
         public static Spel[] RegistreraSpel(Spel[] spelInfo)
         {
 
-                Spel game = new Spel();
+            Spel game = new Spel();
             Console.Write("Ange titel: ");
-                game.titel = Console.ReadLine();
+            game.titel = Console.ReadLine();
             Console.Write("Ange genre: ");
             game.genre = Console.ReadLine();
             Console.Write("Ange betyg: ");
-            game.betyg = ReadInt();
+            game.betyg = TestaInt();
 
-                int antalElement = spelInfo.Length + 1;
-                Spel[] result = new Spel[antalElement];
+            int antalElement = spelInfo.Length + 1;
+            Spel[] result = new Spel[antalElement];
 
-                for (int i = 0; i < spelInfo.Length; i++)
+            for (int i = 0; i < spelInfo.Length; i++)
+            {
+                result[i] = spelInfo[i];
+            }
+
+            result[antalElement - 1] = game;
+
+
+            Spel[] result1;
+            Console.Write("Vill du registrera ett nytt spel? Ja/Nej: ");
+            string svar = Console.ReadLine();
+
+
+
+            while (svar == "ja")
+            {
+
+                Spel game1 = new Spel();
+                Console.WriteLine("Ange titel: ");
+                game1.titel = Console.ReadLine();
+                Console.WriteLine("Ange genre: ");
+                game1.genre = Console.ReadLine();
+                Console.WriteLine("ange betyg");
+                game1.betyg = TestaInt();
+
+                int antalElement1 = result.Length + 1;
+
+                result1 = new Spel[antalElement1];
+                for (int i = 0; i < result.Length; i++)
                 {
-                    result[i] = spelInfo[i];
+                    result1[i] = result[i];
                 }
+                result1[antalElement1 - 1] = game1;
+                result = result1;
+                Console.Write("Vill du registrera ett nytt spel? Ja/Nej: ");
+                svar = Console.ReadLine();
+            }
 
-                result[antalElement - 1] = game;
-              
-
-                Spel[] result1;
-                Console.WriteLine("igen?");
-                string svar = Console.ReadLine();
-
-  
-
-                while (svar == "ja")
-                {
-                    
-                    Spel game1 = new Spel();
-                    Console.WriteLine("Ange titel: ");
-                    game1.titel = Console.ReadLine();
-                    Console.WriteLine("Ange genre: ");
-                    game1.genre = Console.ReadLine();
-                    Console.WriteLine("ange betyg");
-                    game1.betyg = ReadInt();
-
-                    int antalElement1 = result.Length + 1;
-
-                    result1 = new Spel[antalElement1];
-                    for (int i = 0; i < result.Length; i++)
-                    {
-                        result1[i] = result[i];
-                    }
-                    result1[antalElement1 - 1] = game1;
-                    result = result1;
-                    Console.WriteLine("igen?");
-                    svar = Console.ReadLine();
-                }
-
-                return result;       
+            return result;
         }
         public static void SökSpel()
         {
@@ -137,7 +141,7 @@ namespace Skolprojekt_spelregister
 
             }
         }
-        public static int ReadInt()
+        public static int TestaInt()
         {
 
             int d = 0;
@@ -145,10 +149,11 @@ namespace Skolprojekt_spelregister
             while (!int.TryParse(Console.ReadLine(), out d))
             {
                 Console.Write("Måste vara ett numeriskt värde\nFörsök igen: ");
-                
+
 
             }
             return d;
         }
     }
 }
+
