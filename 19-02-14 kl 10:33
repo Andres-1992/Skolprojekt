@@ -1,0 +1,159 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace SpelRegister
+{
+    class Program
+    {
+        public class Spel
+        {
+            public string titel;
+            public string genre;
+            public int betyg;
+        }
+        static void Main(string[] args)
+        {
+            Spel[] spelInfo = new Spel[0];
+            while (true)
+            {
+                SkrivUtMeny();
+                int menyVal = TestaInt();
+                if (menyVal == 1)
+                {
+                    spelInfo = RegistreraSpel(spelInfo);
+                }
+                else if (menyVal == 2)
+                {
+                    SökSpel();
+                }
+                else if (menyVal == 3)
+                {
+                    TaBortSpel();
+                }
+                else if (menyVal == 4)
+                {
+                    SpelBibliotek(spelInfo);
+                }
+                else if (menyVal == 5)
+                {
+                    break;
+                }
+                else
+                {
+                    Console.WriteLine("Oj! här blev det lite fel, försök att ange en siffra mellan 1-5");
+                }
+
+            }
+        }
+
+        public static void SkrivUtMeny()
+        {
+            Console.WriteLine("[1] Registrera spel");
+            Console.WriteLine("----------------------");
+            Console.WriteLine("[2] Sök efter spel");
+            Console.WriteLine("----------------------");
+            Console.WriteLine("[3] Ta bort spel");
+            Console.WriteLine("----------------------");
+            Console.WriteLine("[4] Visa spelbibliotek");
+            Console.WriteLine("----------------------");
+            Console.WriteLine("[5] Avsluta");
+            Console.WriteLine("----------------------");
+            Console.Write("Ange menyval: ");
+
+        }
+        public static Spel[] RegistreraSpel(Spel[] spelInfo)
+        {
+
+            Spel game = new Spel();
+            Console.Write("Ange titel: ");
+            game.titel = Console.ReadLine();
+            Console.Write("Ange genre: ");
+            game.genre = Console.ReadLine();
+            Console.Write("Ange betyg: ");
+            game.betyg = TestaInt();
+
+            int antalElement = spelInfo.Length + 1;
+            Spel[] result = new Spel[antalElement];
+
+            for (int i = 0; i < spelInfo.Length; i++)
+            {
+                result[i] = spelInfo[i];
+            }
+
+            result[antalElement - 1] = game;
+
+
+            Spel[] result1;
+            Console.Write("Vill du registrera ett nytt spel? Ja/Nej: ");
+            string svar = Console.ReadLine();
+
+
+
+            while (svar == "ja")
+            {
+
+                Spel game1 = new Spel();
+                Console.WriteLine("Ange titel: ");
+                game1.titel = Console.ReadLine();
+                Console.WriteLine("Ange genre: ");
+                game1.genre = Console.ReadLine();
+                Console.WriteLine("ange betyg");
+                game1.betyg = TestaInt();
+
+                int antalElement1 = result.Length + 1;
+
+                result1 = new Spel[antalElement1];
+                for (int i = 0; i < result.Length; i++)
+                {
+                    result1[i] = result[i];
+                }
+                result1[antalElement1 - 1] = game1;
+                result = result1;
+                Console.Write("Vill du registrera ett nytt spel? Ja/Nej: ");
+                svar = Console.ReadLine();
+            }
+
+            return result;
+        }
+        public static void SökSpel()
+        {
+            Console.WriteLine("lägg kod för sök spel här");
+            Console.ReadLine();
+        }
+        public static void TaBortSpel()
+        {
+            Console.WriteLine("lägg kod för Ta bort spel här");
+            Console.ReadLine();
+        }
+        public static void SpelBibliotek(Spel[] spelInfo)
+        {
+            Console.WriteLine("¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯");
+            Console.WriteLine("Visar alla lagrade Spel");
+            Console.WriteLine(" ");
+            foreach (Spel spelinfos in spelInfo)
+            {
+                Console.WriteLine("Titel: " + spelinfos.titel + "\nGenre: " + spelinfos.genre + "\nBetyg: " + spelinfos.betyg);
+                Console.WriteLine("¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯");
+
+
+            }
+        }
+        public static int TestaInt()
+        {
+
+            int d = 0;
+
+            while (!int.TryParse(Console.ReadLine(), out d))
+            {
+                Console.Write("Måste vara ett numeriskt värde\nFörsök igen: ");
+
+
+            }
+            return d;
+        }
+    }
+}
+
