@@ -70,12 +70,13 @@ namespace Skolprojekt_spelregister
                 Console.Write("Ange betyg: ");
                 game.betyg = TestaInt();
 
-                LagraSpel(game);
+                
                 Console.WriteLine("Vill du lägga till ett nytt spel? ");
                 svar = Console.ReadLine();
+                LagraSpel(game);
             }
         }
-        public static void LagraSpel(Spel game)
+        public static void LagraSpel(Spel games)
         {
             int antalElement = spelInfo.Length + 1;
             Spel[] result = new Spel[antalElement];
@@ -85,25 +86,21 @@ namespace Skolprojekt_spelregister
                 result[i] = spelInfo[i];
             }
 
-            result[antalElement - 1] = game;
+            result[antalElement - 1] = games;
 
             spelInfo = result;
-
-
         }
         public static void SökSpel()
         {
-            Console.Write("Titel: ");
+            Console.Write("Titel/Genre: ");
             string sökfras = Console.ReadLine();
-            Spel[] hittadetitlar = sökSpelViaTitel(sökfras);
-            HittadeSpel(hittadetitlar);
+            Spel[] hittadeTitlar = sökSpelViaTitel(sökfras);
+            HittadeSpel(hittadeTitlar);
         }
         public static Spel[] sökSpelViaTitel(string sökfras)
         {
             Spel[] hittadeSpel = new Spel[spelInfo.Length];
             int spel = 0;
-
-
 
             for (int i = 0; i < spelInfo.Length; i++)
             {
@@ -112,51 +109,50 @@ namespace Skolprojekt_spelregister
                     hittadeSpel[spel++] = spelInfo[i];
                 }
             }
-            Spel[] hittadespeltrimmade = new Spel[spel];
+            Spel[] hittadeSpelTrimmade = new Spel[spel];
             for (int i = 0; i < spel; i++)
             {
-                hittadespeltrimmade[i] = hittadeSpel[i];
+                hittadeSpelTrimmade[i] = hittadeSpel[i];
             }
-            return hittadespeltrimmade;
+            return hittadeSpelTrimmade;
         }
         public static void TaBortSpel()
         {
             Console.WriteLine("lägg kod för Ta bort spel här");
             Console.ReadLine();
         }
-        public static void SpelBibliotek(Spel[] spelInfo)
+        public static void SpelBibliotek(Spel[] lagradeSpel)
         {
             Console.WriteLine("¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯");
             Console.WriteLine("Visar alla lagrade Spel");
             Console.WriteLine(" ");
-            foreach (Spel spelinfos in spelInfo)
+            foreach (Spel spelinfos in lagradeSpel)
             {
                 Console.WriteLine("Titel: " + spelinfos.titel + "\nGenre: " + spelinfos.genre + "\nBetyg: " + spelinfos.betyg);
                 Console.WriteLine("¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯");
-                Console.Write("Tryck enter/retur för att gå till huvudmenyn ");
-                Console.ReadLine();
-
             }
+            Console.Write("Tryck enter/retur för att gå tillbaka till huvudmenyn ");
+            Console.ReadLine();
         }
-        public static void HittadeSpel(Spel[] spel)
+        public static void HittadeSpel(Spel[] hittadeSpel)
         {
             Console.WriteLine("¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯");
             Console.WriteLine("Visar alla spel som matchar din sökning.");
             Console.WriteLine(" ");
-            foreach (Spel spelinfos in spel)
+            foreach (Spel spelinfos in hittadeSpel)
             {
                 Console.WriteLine("Titel: " + spelinfos.titel + "\nGenre: " + spelinfos.genre + "\nBetyg: " + spelinfos.betyg);
                 Console.WriteLine("¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯");
-                Console.Write("Tryck enter/retur för att gå till huvudmenyn ");
-                Console.ReadLine();
+
 
             }
-
+                Console.Write("Tryck enter/retur för att gå tillbaka till huvudmenyn ");
+                Console.ReadLine();
         }
         public static int TestaInt()
         {
 
-            int d = 0;
+            int d;
 
             while (!int.TryParse(Console.ReadLine(), out d))
             {

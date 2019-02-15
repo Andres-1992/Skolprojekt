@@ -8,5 +8,8 @@ namespace Skolprojekt_spelregister
 {
     class Spel
     {
+        public string titel;
+        public string genre;
+        public int betyg;
     }
 }
