@@ -58,9 +58,9 @@ namespace Skolprojekt_spelregister
         }
         public static void RegistreraSpel()
         {
-            Console.Write("Är du säker?: ");
+            Console.Write("Är du säker? Ja/Nej ");
             string svar = Console.ReadLine();
-            while (svar == "ja" || svar == "JA" || svar == "Ja")
+            while (svar.ToLower() == "ja" || svar == "j")
             {
                 Spel game = new Spel();
                 Console.Write("Ange titel: ");
@@ -70,8 +70,8 @@ namespace Skolprojekt_spelregister
                 Console.Write("Ange betyg: ");
                 game.betyg = TestaInt();
 
-                
-                Console.WriteLine("Vill du lägga till ett nytt spel? ");
+
+                Console.Write("Vill du lägga till ett nytt spel? Ja/Nej ");
                 svar = Console.ReadLine();
                 LagraSpel(game);
             }
@@ -117,10 +117,63 @@ namespace Skolprojekt_spelregister
             return hittadeSpelTrimmade;
         }
         public static void TaBortSpel()
+
+
         {
-            Console.WriteLine("lägg kod för Ta bort spel här");
-            Console.ReadLine();
+            Console.Write("Ange titel att ta bort ");
+            string titel = Console.ReadLine();
+            Spel game = sokeftertitel(titel);
+            if (game == null)
+            {
+                Console.WriteLine("Spel med denna titeln finns inte");
+                return;
+            }
+            kollaOmSpeletFinns(game);
         }
+        public static Spel sokeftertitel(string sokeftertitel)
+        {
+
+            for (int i = 0; i < spelInfo.Length; i++)
+            {
+
+                if (spelInfo[i].titel.ToLower().Contains(sokeftertitel.ToLower()))
+                {
+                    return spelInfo[i];
+                }
+            }
+            return null;
+        }
+
+        public static void kollaOmSpeletFinns(Spel game)
+        {
+            for (int i = 0; i < spelInfo.Length; i++)
+            {
+                if (spelInfo[i] == game)
+                {
+                    taBortSpeletPaRiktigt(i);
+                    return;
+                }
+            }
+        }
+
+        public static void taBortSpeletPaRiktigt(int index)
+        {
+               Console.WriteLine("HITTAD ETT SPEL MED DENNA TITELN , TAR BORT");
+
+                Spel[] temp = new Spel[spelInfo.Length - 1];
+
+                for (int i = 0; i < index; i++)
+                {
+                    temp[i] = spelInfo[i];
+                }
+                for (int i = index + 1; i < spelInfo.Length; i++)
+                {
+                    temp[i - 1] = spelInfo[i];
+                }
+                spelInfo = temp;
+            
+        }
+
         public static void SpelBibliotek(Spel[] lagradeSpel)
         {
             Console.WriteLine("¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯");
@@ -146,8 +199,8 @@ namespace Skolprojekt_spelregister
 
 
             }
-                Console.Write("Tryck enter/retur för att gå tillbaka till huvudmenyn ");
-                Console.ReadLine();
+            Console.Write("Tryck enter/retur för att gå tillbaka till huvudmenyn ");
+            Console.ReadLine();
         }
         public static int TestaInt()
         {
