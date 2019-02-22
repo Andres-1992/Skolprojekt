@@ -8,12 +8,12 @@ namespace Skolprojekt_spelregister
 
         static Spel[] spelInfo = new Spel[0]; // vi lägger våran vektor utanför main metoden men innanför program classen för att den ska vara global och vi kan arbeta med den över hela programmet.
         static void Main(string[] args)
-        {
+        {LaddaInTitlar(); // Laddar in från textfilen SPEL.txt
 
             while (true)
             {
-                Ladda(); // Laddar in från textfilen
-                SkrivUtMeny(); // skriver vår meny med 5 alternativ.
+                 
+                SkrivUtMeny(); // skriver ut vår meny till skärmen.
                 int menyVal = TestaInt(); // vi använder oss av metoden TestaInt för att se om talet användaren matar in är ett heltal.
                 if (menyVal == 1)
                 {
@@ -33,7 +33,7 @@ namespace Skolprojekt_spelregister
                 }
                 else if (menyVal == 5)
                 {
-                    Spara(); // Sparar vår data vi har i vektorn till en textfil.
+                    SparaTitlar(); // Sparar vår data vi har i vektorn till en textfil.
                     break;
                 }
                 else
@@ -43,33 +43,47 @@ namespace Skolprojekt_spelregister
 
             }
         }
-        public static void Ladda()
+        
+        public static void LaddaInTitlar()
         {
             StreamReader infil = new StreamReader("SPEL.txt");
-            string rad;
-            while ((rad = infil.ReadLine()) != null)
+            string rad = infil.ReadLine();
+            while (rad != null)
             {
-                Spel game = new Spel();
                 string[] fält = rad.Split('\t');
+                Spel game = new Spel();
+               
                 game.titel = fält[0];
                 game.genre = fält[1];
                 game.betyg = int.Parse(fält[2]);
 
+                spelInfo = LäggTillSpelTillOrginalVektorn(spelInfo, game);
 
-
+                rad = infil.ReadLine();
             }
 
             infil.Close();
-        }
-        public static void Spara()
+        }
+        public static Spel[] LäggTillSpelTillOrginalVektorn(Spel[] gamlaSpelListan, Spel nyaSpel)
+        {
+            Spel[] nySpelLista = new Spel[gamlaSpelListan.Length+1];
+            for (int i = 0; i < gamlaSpelListan.Length; i++)
+            {
+                nySpelLista[i] = gamlaSpelListan[i];
+            }
+            nySpelLista[gamlaSpelListan.Length] = nyaSpel;
+            return nySpelLista;
+        }
+
+        public static void SparaTitlar()
         {
             StreamWriter utfil = new StreamWriter("SPEL.txt");
             for (int i = 0; i < spelInfo.Length; i++)
             {
                 Spel game = spelInfo[i];
-                utfil.Write("{0}\t{1}\t{2}", game.titel, game.genre, game.betyg);
+                utfil.WriteLine("{0}\t{1}\t{2}\t", game.titel, game.genre, game.betyg);
 
-                utfil.WriteLine();
+               // utfil.WriteLine();
             }
             utfil.Close();
         }
@@ -92,6 +106,7 @@ namespace Skolprojekt_spelregister
         {
             Console.Write("Är du säker? Ja/Nej: ");
             string svar = Console.ReadLine();
+            Console.WriteLine();
             while (svar.ToLower() == "ja" || svar == "j")
             {
                 Spel game = new Spel();
@@ -106,6 +121,7 @@ namespace Skolprojekt_spelregister
                 Console.Write("Vill du lägga till ett nytt spel? Ja/Nej: ");
                 svar = Console.ReadLine();
             }
+            Console.WriteLine();
             if (svar.ToLower() == "nej")
             {
                 return;
@@ -114,6 +130,7 @@ namespace Skolprojekt_spelregister
             {
                 RegistreraSpel();
             }
+            
         }
         public static void LagraSpel(Spel games)
         {
@@ -132,15 +149,19 @@ namespace Skolprojekt_spelregister
         public static void SökSpel()
         {
 
-                Console.Write("Titel/Genre: ");
-                string sökfras = Console.ReadLine();
-                Spel[] hittadeTitlar = sökSpelViaTitel(sökfras);
-                HittadeSpel(hittadeTitlar);
+            Console.Write("Titel/Genre: ");
+            string sökfras = Console.ReadLine();
+            Spel[] hittadeTitlar = sökSpelViaTitel(sökfras);
+            HittadeSpel(hittadeTitlar);
 
-                Console.Write("Vill du göra en ny sökning? ");
-                string svar = Console.ReadLine();
+           Console.Write("Vill du göra en ny sökning? Ja/Nej: ");
+             string svar = Console.ReadLine();
+            if (svar.ToLower()=="ja")
+            {
+                SökSpel();
+            }
+            Console.WriteLine();
 
-            
         }
         public static Spel[] sökSpelViaTitel(string sökfras)
         {
@@ -171,8 +192,6 @@ namespace Skolprojekt_spelregister
             if (game == null)
             {
                 Console.WriteLine("Spel med denna titeln finns inte");
-                Console.Write("Tryck enter/retur för att gå tillbaka till huvudmenyn");
-                Console.ReadLine();
                 return;
             }
             kollaOmSpeletFinns(game);
@@ -263,8 +282,7 @@ namespace Skolprojekt_spelregister
 
 
                 }
-                Console.Write("Tryck enter/retur för att gå tillbaka till huvudmenyn ");
-                Console.ReadLine();
+                Console.WriteLine();
             }
         }
         public static int TestaInt()
