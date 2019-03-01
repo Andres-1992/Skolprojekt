@@ -6,23 +6,18 @@ namespace Skolprojekt_spelregister
 {
     class Program
     {
-
-        static Spel[] spelInfo = new Spel[0]; // vi lägger våran vektor utanför main metoden men innanför program classen för att den ska vara global och vi kan arbeta med den över hela programmet.
+        static Spel[] spelInfo = new Spel[0]; // vi lägger våran vektor utanför main metoden men innanför program Klassen för att den ska vara global och vi kan arbeta med den över hela programmet.
         static void Main(string[] args)
         {
             LaddaInTitlar();
             if (spelInfo.Length==0)
             {
                 SparaTitlar();
-
             }
-
             bool fortsätt = true;
             while (fortsätt == true)
             {
-
                 SkrivUtMeny();
-
                 int menyVal = TestaInt(); switch (menyVal)
                 {
                     case 1:
@@ -51,39 +46,6 @@ namespace Skolprojekt_spelregister
                         Console.WriteLine("Oj! här blev det lite fel, försök att ange en siffra mellan 1-5");
                         break;
                 }
-                /*
-                if (menyVal == 1)
-                {
-                    RegistreraSpel();
-                }
-                else if (menyVal == 2)
-                {
-                    SökSpel();
-                }
-                else if (menyVal == 3)
-                {
-                    TaBortSpel();
-                }
-                else if (menyVal == 4)
-                {
-                    SpelBibliotek();
-                }
-                else if (menyVal == 5)
-                {
-                    SparaTitlar(); 
-                    break;
-                }
-                else if (menyVal == 6)
-                {
-
-                    break;
-                }
-                
-                else
-                {
-                    Console.WriteLine("Oj! här blev det lite fel, försök att ange en siffra mellan 1-5"); // Matar användaren in ett heltal utanför intervallet 1-5 skrivs denna rad ut innan resten av menyn skrivs ut igen
-                }
-                */
             }
         }
         /// <summary>
@@ -92,21 +54,16 @@ namespace Skolprojekt_spelregister
         public static void LaddaInTitlar()
         {
             StreamReader infil = new StreamReader("SPEL.txt");
-            string rad = infil.ReadLine();
-            while (rad != null)
+            string rad;
+            while ((rad=infil.ReadLine()) != null)
             {
                 string[] fält = rad.Split('\t');
                 Spel game = new Spel();
-
                 game.titel = fält[0];
                 game.genre = fält[1];
                 game.betyg = int.Parse(fält[2]);
-
                 LäggTillSpelTillOrginalVektorn(game);
-
-                rad = infil.ReadLine();
             }
-
             infil.Close();
         }
         /// <summary>
@@ -126,21 +83,6 @@ namespace Skolprojekt_spelregister
             spelInfo = nySpelLista;
         }
         /// <summary>
-        /// Spara innehållet från våran orginal vektor till en textfil
-        /// </summary>
-        public static void SparaTitlar()
-        {
-            StreamWriter utfil = new StreamWriter("SPEL.txt");
-            for (int i = 0; i < spelInfo.Length; i++)
-            {
-                Spel game = spelInfo[i];
-                utfil.WriteLine("{0}\t{1}\t{2}\t", game.titel, game.genre, game.betyg);
-
-                // utfil.WriteLine();
-            }
-            utfil.Close();
-        }
-        /// <summary>
         /// Skriver ut menyvalen till skärmen
         /// </summary>
         public static void SkrivUtMeny()
@@ -153,14 +95,13 @@ namespace Skolprojekt_spelregister
             Console.WriteLine("----------------------");
             Console.WriteLine("[4] Visa spelbibliotek");
             Console.WriteLine("----------------------");
-            Console.WriteLine("[5] Visa top 5");
+            Console.WriteLine("[5] Visa topp 5");
             Console.WriteLine("----------------------");
             Console.WriteLine("[6] Spara ändringar och avsluta");
             Console.WriteLine("----------------------");
             Console.WriteLine("[7] Avsluta utan och spara");
             Console.WriteLine("----------------------");
-            Console.Write("Ange menyval 1-6: ");
-
+            Console.Write("Ange menyval 1-7: ");
         }
         /// <summary>
         /// Registrera våra spel(beskriv ytterligare)
@@ -170,7 +111,6 @@ namespace Skolprojekt_spelregister
             Console.Write("Är du säker? Ja/Nej: ");
             string svar = KontrolleraSvar(Console.ReadLine());
             Console.WriteLine();
-
             while (svar.ToLower() == "ja")
             {
                 Spel game = new Spel();
@@ -181,71 +121,41 @@ namespace Skolprojekt_spelregister
                 Console.Write("Ange betyg: ");
                 game.betyg = TestaInt();
                 LagraSpel(game);
-
                 Console.Write("Vill du lägga till ett nytt spel? Ja/Nej: ");
                 svar = KontrolleraSvar(Console.ReadLine());
                 Console.WriteLine();
-
             }
-
-        }
-        public static string KontrolleraSvar(string svaret)
-        {
-            while (!(svaret.ToLower() == "nej" || svaret.ToLower() == "ja"))
-            {
-                Console.Write("Du måste svara ja eller nej: ");
-                svaret = Console.ReadLine();
-            }
-            return svaret;
         }
         public static void LagraSpel(Spel games)
         {
-
             Spel[] result = new Spel[spelInfo.Length + 1];
-
             for (int i = 0; i < spelInfo.Length; i++)
             {
                 result[i] = spelInfo[i];
             }
-
             result[(spelInfo.Length + 1) - 1] = games;
-
             spelInfo = result;
         }
         public static void SökSpel()
         {
-
             string svar = "ja";
             while (svar.ToLower() == "ja")
             {
                 Console.Write("Titel/Genre: ");
-                string sökfras = KontrolleraSökfras(Console.ReadLine());
+                string sökfras = KontrolleraSökfras(Console.ReadLine().Trim());
                 Spel[] hittadeTitlar = sökSpelViaTitel(sökfras);
                 HittadeSpel(hittadeTitlar);
-
                 Console.Write("Vill du göra en ny sökning? Ja/Nej: ");
                 svar = KontrolleraSvar(Console.ReadLine());
                 Console.WriteLine();
             }
         }
-        public static string KontrolleraSökfras(string sökfrasen)
-        {
-            while (sökfrasen == "")
-            {
-                Console.Write("Du måste fylla i raden: ");
-                sökfrasen = Console.ReadLine();
-            }
-            return sökfrasen;
-        }
-
-
         public static Spel[] sökSpelViaTitel(string sökfras)
         {
             Spel[] hittadeSpel = new Spel[spelInfo.Length];
             int spel = 0;
-
             for (int i = 0; i < spelInfo.Length; i++)
-            {
+           {
                 if (spelInfo[i].titel.ToLower().Contains(sökfras.ToLower()) || spelInfo[i].genre.ToLower().Contains(sökfras.ToLower()))
                 {
                     hittadeSpel[spel++] = spelInfo[i];
@@ -258,11 +168,28 @@ namespace Skolprojekt_spelregister
             }
             return hittadeSpelTrimmadVektor;
         }
-        public static void TaBortSpel()
-
-
+        public static void HittadeSpel(Spel[] hittadeSpel)
         {
-
+            if (hittadeSpel.Length == 0)
+            {
+                Console.WriteLine("Hittade inga spel som matchar din sökning");
+                Console.WriteLine();
+            }
+            else
+            {
+                Console.WriteLine("¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯");
+                Console.WriteLine("Visar alla spel som matchar din sökning.");
+                Console.WriteLine();
+                foreach (Spel spelinfos in hittadeSpel)
+                {
+                    Console.WriteLine("Titel: " + spelinfos.titel + "\nGenre: " + spelinfos.genre + "\nBetyg: " + spelinfos.betyg);
+                    Console.WriteLine("¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯");
+                }
+                Console.WriteLine();
+            }
+        }
+        public static void TaBortSpel()
+        {
             ListaÖverSpelAttTaBort();
             if (!(spelInfo.Length == 0))
             {
@@ -279,11 +206,8 @@ namespace Skolprojekt_spelregister
         }
         public static Spel sokeftertitel(string sokeftertitel)
         {
-
-
             for (int i = 0; i < spelInfo.Length; i++)
             {
-
                 if (spelInfo[i].titel.ToLower().Contains(sokeftertitel.ToLower()))
                 {
                     return spelInfo[i];
@@ -291,7 +215,6 @@ namespace Skolprojekt_spelregister
             }
             return null;
         }
-
         public static void kollaOmSpeletFinns(Spel game)
         {
             for (int i = 0; i < spelInfo.Length; i++)
@@ -303,7 +226,6 @@ namespace Skolprojekt_spelregister
                 }
             }
         }
-
         public static void taBortSpeletPaRiktigt(int index)
         {
             Console.WriteLine("HITTAD ETT SPEL MED DENNA TITELN , TAR BORT");
@@ -319,9 +241,29 @@ namespace Skolprojekt_spelregister
                 temp[i - 1] = spelInfo[i];
             }
             spelInfo = temp;
-
         }
-
+        public static void ListaÖverSpelAttTaBort()
+        {
+            if (spelInfo.Length == 0)
+            {
+                Console.WriteLine("Finns inga spel lagrade ännu");
+                Console.Write("Tryck enter/retur för att gå tillbaka till huvudmenyn");
+                Console.ReadKey();
+                Console.WriteLine();
+            }
+            else
+            {
+                Console.WriteLine("¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯");
+                Console.WriteLine("Visar alla lagrade Spel");
+                Console.WriteLine();
+                foreach (Spel spelinfos in spelInfo)
+                {
+                    Console.WriteLine("Titel: " + spelinfos.titel + "\nGenre: " + spelinfos.genre + "\nBetyg: " + spelinfos.betyg);
+                    Console.WriteLine("¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯");
+                }
+                Console.WriteLine();
+            }
+        }
         public static void SpelBibliotek()
         {
             if (spelInfo.Length == 0)
@@ -346,98 +288,80 @@ namespace Skolprojekt_spelregister
                 Console.WriteLine();
             }
         }
-        public static void ListaÖverSpelAttTaBort()
-        {
-            if (spelInfo.Length == 0)
-            {
-                Console.WriteLine("Finns inga spel lagrade ännu");
-                Console.Write("Tryck enter/retur för att gå tillbaka till huvudmenyn");
-                Console.ReadKey();
-                Console.WriteLine();
-
-            }
-            else
-            {
-                Console.WriteLine("¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯");
-                Console.WriteLine("Visar alla lagrade Spel");
-                Console.WriteLine();
-                foreach (Spel spelinfos in spelInfo)
-                {
-                    Console.WriteLine("Titel: " + spelinfos.titel + "\nGenre: " + spelinfos.genre + "\nBetyg: " + spelinfos.betyg);
-                    Console.WriteLine("¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯");
-                }
-                Console.WriteLine();
-            }
-        }
-        public static void HittadeSpel(Spel[] hittadeSpel)
-        {
-            if (hittadeSpel.Length == 0)
-            {
-                Console.WriteLine("Hittade inga spel som matchar din sökning");
-                Console.WriteLine();
-            }
-            else
-            {
-                Console.WriteLine("¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯");
-                Console.WriteLine("Visar alla spel som matchar din sökning.");
-                Console.WriteLine();
-                foreach (Spel spelinfos in hittadeSpel)
-                {
-                    Console.WriteLine("Titel: " + spelinfos.titel + "\nGenre: " + spelinfos.genre + "\nBetyg: " + spelinfos.betyg);
-                    Console.WriteLine("¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯");
-
-
-                }
-                Console.WriteLine();
-            }
-        }
-        public static int TestaInt()
-        {
-
-            int a;
-
-            while (!int.TryParse(Console.ReadLine(), out a))
-            {
-                Console.Write("Måste vara ett numeriskt värde\nFörsök igen: ");
-
-
-            }
-            return a;
-        }
         public static void TopFem()
         {
-            bool osorterad = true;
-            int end = spelInfo.Length - 1;
+            Spel[] temp = new Spel[spelInfo.Length];
+            Array.Copy(spelInfo, temp,spelInfo.Length);
+              bool osorterad = true;
+            int end = temp.Length - 1;
             while(osorterad)
             {
                 osorterad = false;
                 for(int j=0;j<end;j++)
                 {
-                    if (spelInfo[j].betyg<spelInfo[j+1].betyg)
+                if (temp[j].betyg<temp[j+1].betyg)
                     {
-                        Swap(j, j + 1);
+                        Swap(temp,j, j + 1);
                         osorterad = true;
                     }
                 }
                 end--;
             }
-            SkrivUtTop5();
+            SkrivUtTop5(temp);
+            Console.ReadKey();
         }
-        public static void SkrivUtTop5()
+        public static void SkrivUtTop5(Spel[] temp2)
         {
-            for (int i = 0; i < spelInfo.Length && i <5; i++)
+            for (int i = 0; i < temp2.Length && i <5; i++)
            {
-
-                Console.WriteLine(spelInfo[i]);
+                Console.WriteLine(temp2[i]);
            }
         }
-        public static void Swap(int a, int b)
+        public static void Swap(Spel[] temp ,int a, int b)
         {
-            Spel tempspel = spelInfo[a];
-            spelInfo[a] = spelInfo[b];
-            spelInfo[b] = tempspel;
-                
-                
+            Spel tempspel = temp[a];
+            temp[a] = temp[b];
+            temp[b] = tempspel;
+        }
+        /// <summary>
+        /// Spara innehållet från våran orginal vektor till en textfil
+        /// </summary>
+        public static void SparaTitlar()
+        {
+            StreamWriter utfil = new StreamWriter("SPEL.txt");
+            for (int i = 0; i < spelInfo.Length; i++)
+            {
+                Spel game = spelInfo[i];
+                utfil.WriteLine("{0}\t{1}\t{2}\t", game.titel, game.genre, game.betyg);
+            }
+            utfil.Close();
+        }
+        public static string KontrolleraSvar(string svaret)
+        {
+            while (!(svaret.ToLower() == "nej" || svaret.ToLower() == "ja"))
+            {
+                Console.Write("Du måste svara ja eller nej: ");
+                svaret = Console.ReadLine();
+            }
+            return svaret;
+        }
+        public static string KontrolleraSökfras(string sökfrasen)
+        {
+            while (sökfrasen == "")
+            {
+                Console.Write("Du måste fylla i raden: ");
+                sökfrasen = Console.ReadLine().Trim();
+            }
+            return sökfrasen;
+        }
+        public static int TestaInt()
+        {
+            int a;
+            while (!int.TryParse(Console.ReadLine(), out a))
+            {
+                Console.Write("Måste vara ett numeriskt värde\nFörsök igen: ");
+            }
+            return a;
         }
     }
 }
