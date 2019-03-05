@@ -4,7 +4,7 @@ using System.IO;
 
 namespace Skolprojekt_spelregister
 {
-    class Program
+    class Program // litteratur ?
     {
         static Spel[] spelInfo = new Spel[0]; // vi lägger våran vektor utanför main metoden men innanför program Klassen för att den ska vara global och vi kan arbeta med den över hela programmet.
         static void Main(string[] args)
