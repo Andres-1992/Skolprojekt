@@ -1,0 +1,544 @@
+using System;
+namespace Skolprojekt_spelregister
+{
+    public class Spel
+    {
+        public string titel = "";
+        public string genre = "";
+        public int betyg=0;
+        /// <summary>
+        /// Metoden ToString gör att innehållet i våran vektor kan skrivas ut till skärmen på det sättet vi önskar.
+        /// </summary>
+        /// <returns>A <see cref="T:System.String"/> that represents the current <see cref="T:Skolprojekt_spelregister.Spel"/>.</returns>
+        public override string ToString()
+        {
+            return "Titel: " + titel + "\nGenre: " + genre + "\nBetyg: " + betyg + "\n-------------";
+        }
+    }
+}
+
+
+
+
+
+
+
+
+using System;
+using System.IO;
+
+namespace Skolprojekt_spelregister
+{
+    class Program
+    {
+        static Spel[] spelInfo = new Spel[0]; // vi lägger våran vektor utanför main metoden men innanför program Klassen för att den ska vara global och vi kan arbeta med den över hela programmet.
+        static void Main(string[] args)
+        {
+            LaddaInTitlar();
+            bool fortsätt = true;
+            while (fortsätt == true)
+            {
+                SkrivUtMeny();
+                int menyVal = TestaInt();
+                switch (menyVal)
+                {
+                    case 1:
+                        RegistreraSpel();
+                        break;
+                    case 2:
+                        SökSpel();
+                        break;
+                    case 3:
+                        TaBortSpel();
+                        break;
+                    case 4:
+                        SorteraPåTitel();
+                        SpelBibliotek();
+                        break;
+                    case 5:
+                        TopFem();
+                        break;
+                    case 6:
+                        SparaTitlar();
+                        fortsätt = false;
+                        break;
+                    case 7:
+                        fortsätt = false;
+                        break;
+                    default:
+                        Console.WriteLine("Du måste ange en siffra mellan 1-7");
+                        break;
+                }
+            }
+        }
+        /// <summary>
+        /// Ladda in från textfil SPEL.txt
+        /// Skickar sedan vidare objektet till LäggTillSpelTillGlobalVektorn
+        /// Hittas ingen textfil so fortsätter programmet som vanligt.
+        /// </summary>
+        public static void LaddaInTitlar()
+        {
+            try
+            {
+                StreamReader infil = new StreamReader("SPEL.txt");
+                string rad;
+                while ((rad = infil.ReadLine()) != null)
+                {
+                    string[] fält = rad.Split('\t');
+                    Spel game = new Spel();
+                    game.titel = fält[0];
+                    game.genre = fält[1];
+                    game.betyg = int.Parse(fält[2]);
+                    LäggTillSpelTillGlobalVektorn(game);
+                }
+                infil.Close();
+            }
+            catch (FileNotFoundException)
+            {
+                Console.WriteLine("Du har inte skapat en textfil ännu");
+            }
+        }
+        /// <summary>
+        /// Överför innehållet från den temporära vektorn till den globala vektorn.
+        /// </summary>
+        /// <returns>The till spel till orginal vektorn.</returns>
+        /// <param name="gamlaSpelListan">Gamla spel listan.</param>
+        /// <param name="nyaSpel">Nya spel.</param>
+        public static void LäggTillSpelTillGlobalVektorn(Spel nyaSpel)
+        {
+            Spel[] nySpelLista = new Spel[spelInfo.Length + 1];
+            for (int i = 0; i < spelInfo.Length; i++)
+            {
+                nySpelLista[i] = spelInfo[i];
+            }
+            nySpelLista[spelInfo.Length] = nyaSpel;
+            spelInfo = nySpelLista;
+        }
+        /// <summary>
+        /// Skriver ut menyvalen till skärmen
+        /// </summary>
+        public static void SkrivUtMeny()
+        {
+            Console.WriteLine("[1] Registrera spel");
+            Console.WriteLine("----------------------");
+            Console.WriteLine("[2] Sök efter spel");
+            Console.WriteLine("----------------------");
+            Console.WriteLine("[3] Ta bort spel");
+            Console.WriteLine("----------------------");
+            Console.WriteLine("[4] Visa spelbibliotek");
+            Console.WriteLine("----------------------");
+            Console.WriteLine("[5] Visa topp 5");
+            Console.WriteLine("----------------------");
+            Console.WriteLine("[6] Spara ändringar och avsluta");
+            Console.WriteLine("----------------------");
+            Console.WriteLine("[7] Avsluta utan och spara");
+            Console.WriteLine("----------------------");
+            Console.Write("Ange menyval 1-7: ");
+        }
+        /// <summary>
+        /// Först kontrollfråga om man är säker, sedan skapas ett objekt där
+        /// värden som användaren matar in lagras i, sedan skickas objektet till metoden LagraSpel.
+        /// Slutligen ytterligare kontrollfråga om man vill lägga till nytt spel.
+        /// </summary>
+        public static void RegistreraSpel()
+        {
+            Console.Write("Är du säker? Ja/Nej: ");
+            string svar = KontrolleraSvar(Console.ReadLine().ToLower());
+            Console.WriteLine();
+            while (svar == "ja" || svar == "j")
+            {
+                Spel game = new Spel();
+                Console.Write("Ange titel: ");
+                game.titel = Console.ReadLine().Trim();
+                Console.Write("Ange genre: ");
+                game.genre = Console.ReadLine().Trim();
+                Console.Write("Ange betyg: ");
+                game.betyg = TestaInt();
+                LagraSpel(game);
+                Console.Write("Vill du lägga till ett nytt spel? Ja/Nej: ");
+                svar = KontrolleraSvar(Console.ReadLine().ToLower());
+                Console.WriteLine();
+            }
+        }
+        /// <summary>
+        /// Tar emot ett objekt med värden.
+        /// Ny vektor skapas som har 1 element mer än den globala vektorn.
+        /// Befintliga spel(om det finns några) i den globala vektorn läggs till den nya temporära vektorn sedan
+        /// lagras det nya spelet i den sista tomma elementet i den temporära vektorn
+        /// och slutligen så läggs alla spel till den globala vektorn.
+        /// </summary>
+        /// <param name="games">Games.</param>
+        public static void LagraSpel(Spel games)
+        {
+            Spel[] result = new Spel[spelInfo.Length + 1];
+            for (int i = 0; i < spelInfo.Length; i++)
+            {
+                result[i] = spelInfo[i];
+            }
+            result[(spelInfo.Length + 1) - 1] = games;
+            spelInfo = result;
+        }
+        /// <summary>
+        /// Användaren matar in sin sökfras sedan skapas en ny temporär vektor som heter hittadeTitlar.
+        /// Sökfrasen skickas vidare till metoden SökSpelViaTitel som returnerar en vektor med spel som matchar
+        /// användarens sökfras, den temporära vektorn hittadeTitlar tilldelas dessa referenser och skickas sedan vidare
+        /// till metoden HittadeSpel som i sin tur skriver ut spelen till skärmen.
+        /// Slutligen ställs en fråga om man vill göra en ny sökning.
+        /// 
+        /// </summary>
+        public static void SökSpel()
+        {
+            string svar = "ja";
+            while (svar == "ja" || svar == "j")
+            {
+                Console.Write("Titel/Genre: ");
+                string sökfras = KontrolleraSökfras(Console.ReadLine().Trim());
+                Spel[] hittadeTitlar = SökSpelViaTitel(sökfras);
+                HittadeSpel(hittadeTitlar);
+                Console.Write("Vill du göra en ny sökning? Ja/Nej: ");
+                svar = KontrolleraSvar(Console.ReadLine().ToLower());
+                Console.WriteLine();
+            }
+        }
+        /// <summary>
+        /// Metoden tar emot en sträng och returnerar en vektor.
+        /// Ny temporär vektor,hittadeSpel, skapas med lika många element som den globala vektorn. for loopen går igenom den globala vektorn
+        /// för att hitta en matchning av sökfrasen i antingen titel eller genre, får den en matchning så tilldelas den temporära vektorn, hittadeSpel, dessa referenser.
+        /// Sedan skapas en ny temporär vektor, hittadeSpelTrimmadVektor, som tilldelas lika många element som antalet matchade sökningar,
+        /// referenserna i hittadeSpel tilldelas till hittadeSpelTrimmadVektor. Slutligen så returneras hela vektorn hittadeSpelTrimmadVektor.
+        /// </summary>
+        /// <returns>The spel via titel.</returns>
+        /// <param name="sökfras">Sökfras.</param>
+        public static Spel[] SökSpelViaTitel(string sökfras)
+        {
+            Spel[] hittadeSpel = new Spel[spelInfo.Length];
+            int spel = 0;
+            for (int i = 0; i < spelInfo.Length; i++)
+           {
+                if (spelInfo[i].titel.ToLower().Contains(sökfras.ToLower()) || spelInfo[i].genre.ToLower().Contains(sökfras.ToLower()))
+                {
+                    hittadeSpel[spel++] = spelInfo[i];
+                }
+            }
+            Spel[] hittadeSpelTrimmadVektor = new Spel[spel];
+            for (int i = 0; i < spel; i++)
+            {
+                hittadeSpelTrimmadVektor[i] = hittadeSpel[i];
+            }
+            return hittadeSpelTrimmadVektor;
+        }
+        /// <summary>
+        /// Metoden tar emot en vektor.
+        /// Skriver ut spel informationen till skärmen om vektorn innehåller något,
+        /// annars får man ett meddelande att inga spel matchar sökningen
+        /// </summary>
+        /// <param name="hittadeSpel">Hittade spel.</param>
+        public static void HittadeSpel(Spel[] hittadeSpel)
+        {
+            if (hittadeSpel.Length == 0)
+            {
+                Console.WriteLine("Hittade inga spel som matchar din sökning");
+                Console.WriteLine();
+            }
+            else
+            {
+                Console.WriteLine("¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯");
+                Console.WriteLine("Visar alla spel som matchar din sökning.");
+                Console.WriteLine();
+                for (int i = 0; i < hittadeSpel.Length; i++) 
+                {
+                    Console.WriteLine(hittadeSpel[i]);
+                }
+                Console.WriteLine();
+            }
+        }
+        /// <summary>
+        /// Först skrivs en lista med alla lagrade spel ut, är vektorn tom 
+        /// så får man ett felmeddelande samt att metoden avslutas
+        /// och programmet går tillbaka till huvudmenyn.
+        /// Finns det lagrade spel så får användaren mata in titeln på det spelet
+        /// man vill radera. Nytt objekt i klassen Spel skapas och
+        /// användarens sökfras skickas till metoden SokEfterTitel som returnerar ett objekt,
+        /// är objektet tomt får man ett felmeddelande och metoden avslutas. Är objektet
+        /// inte tomt så skickas den vidare till metoden KollaOmSpeletFinns.
+        /// </summary>
+        public static void TaBortSpel()
+        {
+            ListaÖverSpelAttTaBort();
+            if (!(spelInfo.Length == 0)) 
+            {
+                Console.Write("Ange titel att ta bort: ");
+                string titel = KontrolleraSökfras(Console.ReadLine().Trim());
+                Spel game = SokEfterTitel(titel);
+                if (game == null)
+                {
+                    Console.WriteLine(titel+ " finns inte i spelbiblioteket");
+                    return;
+                }
+                KollaOmSpeletFinns(game);
+            }
+        }
+        /// <summary>
+        /// Metoden tar emot en sträng och returnerar ett objekt i klassen Spel.
+        /// for loop som går igenom hela den globala vektorn med linjär sökning. Hittas ett objekt som matchar sökfrasen 
+        /// så returneras hela objektet. Hittas det inget matchande objekt så returneras null.
+        /// </summary>
+        /// <returns>The efter titel.</returns>
+        /// <param name="sokeftertitel">Sokeftertitel.</param>
+        public static Spel SokEfterTitel(string sokeftertitel)
+        {
+            for (int i = 0; i < spelInfo.Length; i++)
+            {
+                if (spelInfo[i].titel.ToLower().Contains(sokeftertitel.ToLower()))
+                {
+                    return spelInfo[i];
+                    
+                }
+            }
+            return null;
+        }
+        /// <summary>
+        /// Metoden tar emot ett objekt från klassen Spel.
+        /// for loopen går igenom den globala vektorn, när man har hittat ett objekt som matchar det
+        /// inskickade objektet så skickas index siffran (i) vidare till metoden TaBortSpeletPaRiktigt.
+        /// Sedan avslutas metoden.
+        /// </summary>
+        /// <param name="game">Game.</param>
+        public static void KollaOmSpeletFinns(Spel game)
+        {
+            for (int i = 0; i < spelInfo.Length; i++)
+            {
+                if (spelInfo[i] == game)
+                {
+                    TaBortSpeletPaRiktigt(i);
+                    return;
+                }
+            }
+        }
+        /// <summary>
+        /// Metoden tar emot en integer.
+        /// talar om att en titel har hittats och frågar om man är säker på att man vill radera den.
+        /// Svarar man ja så skapas en temporär vektor med ett element mindre än den globala vektorn.
+        /// Första forloopen lagrar alla spel i den temporära vektorn
+        /// fram till den platsen där den titeln man vill radera ligger i.
+        /// Den andra forloopen lagrar alla spel i den temporära vektorn
+        /// efter den platsen där den tilteln man vill radera ligger i.
+        /// Nu innehåller den temporära vektorn alla spel förutom det man ville radera, för att man har hoppat över den "platsen"
+        /// Slutligen tilldelas den globala vektorn innehållet i den temporära vektorn
+        /// </summary>
+        /// <param name="index">Index.</param>
+        public static void TaBortSpeletPaRiktigt(int index)
+        {
+            Console.Write("Hittade " + spelInfo[index].titel + ", är du säker på att du vill radera detta spel?\nJa/nej: ");
+            string svar = KontrolleraSvar(Console.ReadLine().ToLower());
+
+            if (svar == "ja" || svar == "j")
+            {
+                Spel[] temp = new Spel[spelInfo.Length - 1];
+
+                for (int i = 0; i < index; i++)
+                {
+                    temp[i] = spelInfo[i];
+                }
+                for (int i = index + 1; i < spelInfo.Length; i++)
+                {
+                    temp[i - 1] = spelInfo[i];
+                }
+                spelInfo = temp;
+            }
+        }
+        /// <summary>
+        /// Skriver ut spel informationen till skärmen från den globala vektorn om vektorn innehåller något,
+        /// annars får man ett meddelande att inga spel är lagrade ännu.
+        /// </summary>
+        public static void ListaÖverSpelAttTaBort()
+        {
+            if (spelInfo.Length == 0)
+            {
+                Console.WriteLine("Finns inga spel lagrade ännu");
+                Console.Write("Tryck enter/retur för att gå tillbaka till huvudmenyn");
+                Console.ReadKey();
+                Console.WriteLine();
+            }
+            else
+            {
+                Console.WriteLine("¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯");
+                Console.WriteLine("Visar alla lagrade Spel");
+                Console.WriteLine();
+                foreach (Spel spelinfos in spelInfo)
+                {
+
+                    Console.WriteLine( "Titel: {0} \nGenre: {1} \nBetyg: {2}",spelinfos.titel,spelinfos.genre,spelinfos.betyg);
+                    Console.WriteLine("¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯");
+                }
+                Console.WriteLine();
+            }
+        }
+        /// <summary>
+        /// Exchange sort algoritm som sorterar den globala vektorn efter titel från minst till störst.
+        /// </summary>
+        public static void SorteraPåTitel()
+        {
+            for (int i = 0; i < spelInfo.Length; i++)
+            {
+                int minst = i;
+                for (int j = i + 1; j < spelInfo.Length; j++)
+                {
+                    if (spelInfo[minst].titel.CompareTo(spelInfo[j].titel)>0)
+                    {
+                        minst = j;
+                    }
+                    if (i<minst)
+                    {
+                        Swap(spelInfo, minst, i);
+                    }
+                }
+            }
+        }
+        /// <summary>
+        /// Skriver ut spel informationen till skärmen från den globala vektorn om vektorn innehåller något,
+        /// annars får man ett meddelande att inga spel är lagrade ännu.
+        /// </summary>
+        public static void SpelBibliotek()
+        {
+            if (spelInfo.Length == 0)
+            {
+                Console.WriteLine("Finns inga spel lagrade ännu");
+                Console.Write("Tryck enter/retur för att gå tillbaka till huvudmenyn");
+                Console.ReadKey();
+                Console.WriteLine();
+            }
+            else
+            {
+                Console.WriteLine("¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯");
+                Console.WriteLine("Visar alla lagrade Spel");
+                Console.WriteLine();
+                for (int i = 0; i < spelInfo.Length;i++)
+                {
+                    Console.WriteLine(spelInfo[i]);
+                }
+                Console.Write("Tryck enter/retur för att gå tillbaka till huvudmenyn");
+                Console.ReadKey();
+                Console.WriteLine();
+            }
+        }
+        /// <summary>
+        /// Bubbel sort algoritm som sorterar en temporär vektor med indentiskt innehåll som 
+        /// den globala vektorn efter betyg från störst till minst.
+        /// Den temporära sorterade
+        /// vektorn skickas sedan vidare till metoden SkrivUtTop5 för att skriva ut en topp 5 lista till skärmen.
+        /// </summary>
+        public static void TopFem()
+        {
+            Spel[] temp = new Spel[spelInfo.Length];
+            Array.Copy(spelInfo, temp,spelInfo.Length);
+            bool osorterad = true;
+            int end = temp.Length - 1;
+            while(osorterad)
+            {
+                osorterad = false;
+                for(int j=0;j<end;j++)
+                {
+                    if (temp[j].betyg<temp[j + 1].betyg)
+                    {
+                        Swap(temp,j, j + 1);
+                        osorterad = true;
+                    }
+                }
+                end--;
+            }
+            SkrivUtTop5(temp);
+            Console.ReadKey();
+        }
+        /// <summary>
+        /// Metoden tar emot en vektor.
+        /// Skriver ut en max 5 spel till skärmen.
+        /// </summary>
+        /// <param name="temp2">Temp2.</param>
+        public static void SkrivUtTop5(Spel[] temp2)
+        {
+            for (int i = 0; i < temp2.Length && i <5; i++)
+           {
+                Console.WriteLine(temp2[i]);
+           }
+        }
+        /// <summary>
+        /// Metoden tar emot en vektor och två integer.
+        /// Byter plats på 2 värden i två objekt med hjälp av ett tredje objekt som är temporärt.
+        /// </summary>
+        /// <param name="temp">Temp.</param>
+        /// <param name="a">The alpha component.</param>
+        /// <param name="b">The blue component.</param>
+        public static void Swap(Spel[] temp ,int a, int b)
+        {
+            Spel tempspel = temp[a];
+            temp[a] = temp[b];
+            temp[b] = tempspel;
+        }
+        /// <summary>
+        /// Spara innehållet från våran orginal vektor till en textfil
+        /// </summary>
+        public static void SparaTitlar()
+        {
+            StreamWriter utfil = new StreamWriter("SPEL.txt");
+            for (int i = 0; i < spelInfo.Length; i++)
+            {
+                Spel game = spelInfo[i];
+                utfil.WriteLine("{0}\t{1}\t{2}\t", game.titel, game.genre, game.betyg);
+            }
+            utfil.Close();
+        }
+        /// <summary>
+        /// Metoden tar emot en sträng och returnerar en sträng.
+        /// while loop som kontrollerar att användaren har skrivit angivit 
+        /// rätt svar ("ja" || "j" || "nej || "n") annars får man ett felmeddelande och en ny chans att fylla i sitt svar.
+        /// När användaren har fyllt i rätt svar så skickas en sträng tillbaka som innehåller rätt svar.
+        /// </summary>
+        /// <returns>The svar.</returns>
+        /// <param name="svaret">Svaret.</param>
+        public static string KontrolleraSvar(string svaret)
+        {
+            while (!(svaret == "nej" || svaret == "ja" || svaret == "j" || svaret == "n"))
+            {
+                Console.Write("Du måste svara ja eller nej: ");
+                svaret = Console.ReadLine().ToLower();
+            }
+            return svaret;
+        }
+        /// <summary>
+        /// Metoden tar emot en sträng och returnerar en sträng.
+        /// While loop som kontrollerar att användaren inte matat in en tom rad när man gör en sökning.
+        /// Matar användaren in en tom rad så får man ett felmeddelande och en ny chans att fylla i raden.
+        /// När man fyllt i raden så returneras den som en sträng.
+        /// (anledningen till att vi har skapat denna metod är för att vi märkte att när man gör en sökning med en tom rad
+        /// så visas all information i vektorn man söker i)
+        /// </summary>
+        /// <returns>The sökfras.</returns>
+        /// <param name="sökfrasen">Sökfrasen.</param>
+        public static string KontrolleraSökfras(string sökfrasen)
+        {
+            while (sökfrasen == "")
+            {
+                Console.Write("Du måste fylla i raden: ");
+                sökfrasen = Console.ReadLine().Trim();
+            }
+            return sökfrasen;
+        }
+        /// <summary>
+        /// Metoden returnerar en integer.
+        /// while loop som kontrollerar att värdet användaren matar in går att konvertera till en integer.
+        /// Misslyckas TryParse så får användaren ett felmeddelande och en ny chans att mata in ett värde.
+        /// När väl TryParse har lyckats konvertera värdet till en integer så returneras det värdet som en integer.
+        /// </summary>
+        /// <returns>The int.</returns>
+        public static int TestaInt()
+        {
+            int a;
+            while (!int.TryParse(Console.ReadLine(), out a))
+            {
+                Console.Write("Måste vara ett numeriskt värde\nFörsök igen: ");
+            }
+            return a;
+        }
+    }
+}
